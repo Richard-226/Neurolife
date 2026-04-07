@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroLife PRO</title>
+
+<style>
+body {
+    font-family: Arial;
+    transition: 0.3s;
+}
+
+.dark { background:#0f172a; color:white; }
+.light { background:#f1f5f9; color:black; }
+
+.card {
+    padding:20px;
+    margin:15px;
+    border-radius:15px;
+    background:#1e293b;
+}
+
+.light .card { background:white; }
+
+button {
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    background:#22c55e;
+    color:white;
+    cursor:pointer;
+}
+
+input {
+    padding:10px;
+    margin:5px;
+    border-radius:8px;
+    border:none;
+}
+
+.hidden { display:none; }
+</style>
+</head>
+
+<body class="dark">
+
+<h1>🧠 NeuroLife PRO</h1>
+
+<!-- LOGIN -->
+<div id="auth" class="card">
+<h2>Login / Cadastro</h2>
+<input id="user" placeholder="Usuário"><br>
+<input id="pass" type="password" placeholder="Senha"><br>
+<button onclick="register()">Cadastrar</button>
+<button onclick="login()">Entrar</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<div class="card">
+👤 <span id="username"></span> |
+Plano: <span id="plan">FREE</span>
+<br>
+<button onclick="toggleTheme()">🌗 Tema</button>
+<button onclick="upgrade()">💎 Virar PLUS</button>
+<button onclick="logout()">Sair</button>
+</div>
+
+<div class="card">
+<h2>Nível <span id="level">1</span></h2>
+XP: <span id="xp">0</span>
+</div>
+
+<div class="card">
+<button onclick="gainXP(10)">📚 Estudar</button>
+<button onclick="gainXP(15)">🏋️ Treinar</button>
+<button onclick="gainXP(5)">📖 Ler</button>
+</div>
+
+<div class="card">
+<h3>🤖
