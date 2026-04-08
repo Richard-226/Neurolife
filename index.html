@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,78 +7,204 @@
 
 <style>
 body {
-    font-family: Arial;
-    transition: 0.3s;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
 }
 
-.dark { background:#0f172a; color:white; }
-.light { background:#f1f5f9; color:black; }
+.container {
+  padding: 20px;
+  text-align: center;
+}
 
 .card {
-    padding:20px;
-    margin:15px;
-    border-radius:15px;
-    background:#1e293b;
-}
-
-.light .card { background:white; }
-
-button {
-    padding:10px;
-    margin:5px;
-    border:none;
-    border-radius:8px;
-    background:#22c55e;
-    color:white;
-    cursor:pointer;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 20px;
+  max-width: 350px;
+  margin: auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
 input {
-    padding:10px;
-    margin:5px;
-    border-radius:8px;
-    border:none;
+  width: 90%;
+  padding: 12px;
+  margin: 10px;
+  border-radius: 12px;
+  border: none;
 }
 
-.hidden { display:none; }
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 12px;
+  background: #22c55e;
+  color: white;
+}
+
+#chat {
+  display: none;
+  height: 100vh;
+  flex-direction: column;
+}
+
+#topbar {
+  background: #1e293b;
+  padding: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.msg {
+  padding: 10px;
+  border-radius: 12px;
+  margin: 5px;
+  max-width: 70%;
+}
+
+.user {
+  background: #22c55e;
+  align-self: flex-end;
+}
+
+.bot {
+  background: #334155;
+  align-self: flex-start;
+}
+
+.input-bar {
+  display: flex;
+  padding: 10px;
+  background: #1e293b;
+}
+
+.input-bar input {
+  flex: 1;
+}
 </style>
 </head>
 
-<body class="dark">
+<body>
 
-<h1>🧠 NeuroLife PRO</h1>
+<div id="login" class="container">
+  <h1>🧠 NeuroLife PRO</h1>
 
-<!-- LOGIN -->
-<div id="auth" class="card">
-<h2>Login / Cadastro</h2>
-<input id="user" placeholder="Usuário"><br>
-<input id="pass" type="password" placeholder="Senha"><br>
-<button onclick="register()">Cadastrar</button>
-<button onclick="login()">Entrar</button>
+  <div class="card">
+    <h2>Login / Cadastro</h2>
+    <input id="user" placeholder="Usuário">
+    <input id="pass" type="password" placeholder="Senha">
+
+    <br>
+    <button onclick="cadastrar()">Cadastrar</button>
+    <button onclick="login()">Entrar</button>
+  </div>
 </div>
 
-<!-- APP -->
-<div id="app" class="hidden">
+<div id="chat">
+  <div id="topbar">NeuroLife IA</div>
 
-<div class="card">
-👤 <span id="username"></span> |
-Plano: <span id="plan">FREE</span>
-<br>
-<button onclick="toggleTheme()">🌗 Tema</button>
-<button onclick="upgrade()">💎 Virar PLUS</button>
-<button onclick="logout()">Sair</button>
+  <div id="messages"></div>
+
+  <div class="input-bar">
+    <input id="msgInput" placeholder="Digite sua mensagem...">
+    <button onclick="enviar()">➤</button>
+  </div>
 </div>
 
-<div class="card">
-<h2>Nível <span id="level">1</span></h2>
-XP: <span id="xp">0</span>
-</div>
+<script>
+let usuarioAtual = "";
 
-<div class="card">
-<button onclick="gainXP(10)">📚 Estudar</button>
-<button onclick="gainXP(15)">🏋️ Treinar</button>
-<button onclick="gainXP(5)">📖 Ler</button>
-</div>
+function cadastrar() {
+  let user = userInput();
+  let pass = passInput();
 
-<div class="card">
-<h3>🤖
+  if(!user || !pass){
+    alert("Preencha tudo!");
+    return;
+  }
+
+  localStorage.setItem("user_" + user, pass);
+  alert("Cadastrado!");
+}
+
+function login() {
+  let user = userInput();
+  let pass = passInput();
+
+  let savedPass = localStorage.getItem("user_" + user);
+
+  if(savedPass === pass){
+    usuarioAtual = user;
+    document.getElementById("login").style.display = "none";
+    document.getElementById("chat").style.display = "flex";
+    carregarMensagens();
+  } else {
+    alert("Erro no login!");
+  }
+}
+
+function userInput(){
+  return document.getElementById("user").value;
+}
+
+function passInput(){
+  return document.getElementById("pass").value;
+}
+
+function enviar() {
+  let input = document.getElementById("msgInput");
+  let msg = input.value;
+
+  if(!msg) return;
+
+  addMsg(msg, "user");
+  salvarMsg(msg, "user");
+
+  input.value = "";
+
+  setTimeout(() => {
+    let resposta = gerarResposta(msg);
+    addMsg(resposta, "bot");
+    salvarMsg(resposta, "bot");
+  }, 500);
+}
+
+function addMsg(texto, tipo){
+  let div = document.createElement("div");
+  div.className = "msg " + tipo;
+  div.innerText = texto;
+  document.getElementById("messages").appendChild(div);
+}
+
+function salvarMsg(msg, tipo){
+  let historico = JSON.parse(localStorage.getItem("chat_" + usuarioAtual)) || [];
+  historico.push({msg, tipo});
+  localStorage.setItem("chat_" + usuarioAtual, JSON.stringify(historico));
+}
+
+function carregarMensagens(){
+  let historico = JSON.parse(localStorage.getItem("chat_" + usuarioAtual)) || [];
+  historico.forEach(m => addMsg(m.msg, m.tipo));
+}
+
+function gerarResposta(msg){
+  msg = msg.toLowerCase();
+
+  if(msg.includes("oi")) return "Olá! Como posso te ajudar?";
+  if(msg.includes("dinheiro")) return "Quer dicas para ganhar dinheiro? 😏";
+  if(msg.includes("app")) return "Seu app está ficando top!";
+  
+  return "Interessante... me conta mais!";
+}
+</script>
+
+</body>
+</html>
